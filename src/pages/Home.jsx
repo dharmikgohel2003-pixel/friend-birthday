@@ -16,7 +16,7 @@ export default function Home() {
   const birthdayMidnight = new Date(
     new Date().getFullYear(),
     0, // January
-    29,
+    30,
     0, 0, 0
   );
 
