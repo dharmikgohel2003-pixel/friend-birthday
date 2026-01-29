@@ -1,37 +1,40 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate();
+
   const [now, setNow] = useState(new Date());
   const [showVideo, setShowVideo] = useState(false);
-  const [videoDone, setVideoDone] = useState(false);
+  const [videoFinished, setVideoFinished] = useState(false);
 
-  // ⏰ Update time every second
+  // ⏰ Live clock
   useEffect(() => {
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       setNow(new Date());
     }, 1000);
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, []);
 
-  // 🎂 Birthday date
-  const birthdayMidnight = new Date(
+  // 🎂 Birthday date (CHANGE IF NEEDED)
+  const birthdayTime = new Date(
     new Date().getFullYear(),
-    0, // January
+    0, // January = 0
     30,
     0, 0, 0
   );
 
-  const isBirthdayTime = now >= birthdayMidnight;
+  const isBirthdayTime = now >= birthdayTime;
 
-  // 🎬 Trigger video ONLY once
+  // 🎬 Start video only once when time completes
   useEffect(() => {
-    if (isBirthdayTime && !videoDone) {
+    if (isBirthdayTime && !videoFinished) {
       setShowVideo(true);
     }
-  }, [isBirthdayTime, videoDone]);
+  }, [isBirthdayTime, videoFinished]);
 
   // ⏳ Countdown calculation
-  const diff = birthdayMidnight - now;
+  const diff = birthdayTime - now;
   const hours = Math.max(Math.floor(diff / (1000 * 60 * 60)), 0);
   const minutes = Math.max(Math.floor((diff / (1000 * 60)) % 60), 0);
   const seconds = Math.max(Math.floor((diff / 1000) % 60), 0);
@@ -48,18 +51,18 @@ export default function Home() {
             playsInline
             onEnded={() => {
               setShowVideo(false);
-              setVideoDone(true);
+              setVideoFinished(true);
             }}
             className="w-screen h-screen object-cover"
           />
         </div>
       )}
 
-      {/* 🌸 MAIN PAGE */}
+      {/* 🌸 MAIN CONTENT */}
       <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-rose-100 flex items-center justify-center p-4">
         <div className="bg-white/70 backdrop-blur-lg max-w-xl w-full rounded-3xl shadow-xl p-8 text-center">
 
-          {/* ⏳ COUNTDOWN */}
+          {/* ⏳ STEP 1: COUNTDOWN */}
           {!isBirthdayTime && (
             <>
               <p className="text-sm text-gray-600 mb-2">
@@ -82,23 +85,39 @@ export default function Home() {
             </>
           )}
 
-          {/* 🎉 HAPPY BIRTHDAY */}
-          {isBirthdayTime && videoDone && (
+          {/* 🎉 STEP 4: HAPPY BIRTHDAY PAGE */}
+          {isBirthdayTime && videoFinished && (
             <>
               <h1 className="text-4xl font-bold text-purple-600">
                 Happy Birthday 🎉
               </h1>
 
               <h2 className="text-xl mt-2 text-gray-700">
-                To Someone Truly Special 💖
+                Chavani💖
               </h2>
 
               <div className="w-20 h-1 bg-pink-400 mx-auto my-6 rounded-full"></div>
 
               <p className="text-gray-700 text-lg leading-relaxed">
-                May your day be filled with happiness,
-                smiles, and beautiful moments ✨
+                Dear Chavani, birthday wishes kese kiya jata he muje nay aata, lekin muje abhi bhi yad he hamare pura ne din, i know bahut jayada time nay huaa he lekin kuchha story he . ✨
               </p>
+
+              {/* 🔘 NEVER FORGET BUTTONS */}
+              <div className="mt-8 flex justify-center gap-4">
+                <button
+                  onClick={() => navigate("/rain")}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-500 text-white font-semibold shadow-md hover:bg-blue-600 transition"
+                >
+                  🌧️ Rain
+                </button>
+
+                <button
+                  onClick={() => navigate("/bick")}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-pink-500 text-white font-semibold shadow-md hover:bg-pink-600 transition"
+                >
+                  🏍️ Bick
+                </button>
+              </div>
 
               <p className="mt-8 text-sm text-gray-600">
                 Made with ❤️ by your best friend
