@@ -1,18 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [now, setNow] = useState(new Date());
-  const audioRef = useRef(null);
-  const navigate = useNavigate();
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoDone, setVideoDone] = useState(false);
 
-  // update time every second
+  // ⏰ Update time every second
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  // 🎂 Birthday: 29 January, 12:00 AM
+  // 🎂 Birthday date
   const birthdayMidnight = new Date(
     new Date().getFullYear(),
     0, // January
@@ -22,12 +23,12 @@ export default function Home() {
 
   const isBirthdayTime = now >= birthdayMidnight;
 
-  // 🎵 play song at birthday time
+  // 🎬 Trigger video ONLY once
   useEffect(() => {
-    if (isBirthdayTime && audioRef.current) {
-      audioRef.current.play().catch(() => {});
+    if (isBirthdayTime && !videoDone) {
+      setShowVideo(true);
     }
-  }, [isBirthdayTime]);
+  }, [isBirthdayTime, videoDone]);
 
   // ⏳ Countdown calculation
   const diff = birthdayMidnight - now;
@@ -36,82 +37,81 @@ export default function Home() {
   const seconds = Math.max(Math.floor((diff / 1000) % 60), 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-rose-100 flex items-center justify-center p-4">
-      <div className="bg-white/70 backdrop-blur-lg max-w-xl w-full rounded-3xl shadow-xl p-8 text-center">
+    <>
+      {/* 🎬 FULL SCREEN VIDEO */}
+      {showVideo && (
+        <div className="fixed inset-0 z-[9999] bg-black">
+          <video
+            src="/birthday-intro.mp4"
+            autoPlay
+            muted
+            playsInline
+            onEnded={() => {
+              setShowVideo(false);
+              setVideoDone(true);
+            }}
+            className="w-screen h-screen object-cover"
+          />
+        </div>
+      )}
 
-        {/* BEFORE BIRTHDAY → CLOCK UI */}
-        {!isBirthdayTime ? (
-          <>
-            <p className="text-sm text-gray-600 mb-2">
-              ⏰ {now.toLocaleTimeString()}
-            </p>
+      {/* 🌸 MAIN PAGE */}
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-rose-100 flex items-center justify-center p-4">
+        <div className="bg-white/70 backdrop-blur-lg max-w-xl w-full rounded-3xl shadow-xl p-8 text-center">
 
-            <h1 className="text-3xl font-bold text-purple-600 mb-6">
-              Countdown to Something Special ✨
-            </h1>
+          {/* ⏳ COUNTDOWN */}
+          {!isBirthdayTime && (
+            <>
+              <p className="text-sm text-gray-600 mb-2">
+                ⏰ {now.toLocaleTimeString()}
+              </p>
 
-            <div className="flex justify-center gap-4">
-              <TimeBox label="Hours" value={hours} />
-              <TimeBox label="Minutes" value={minutes} />
-              <TimeBox label="Seconds" value={seconds} />
-            </div>
+              <h1 className="text-3xl font-bold text-purple-600 mb-6">
+                Countdown to Something Special ✨
+              </h1>
 
-            <p className="mt-6 text-gray-700">
-              Just a little more time… 💖
-            </p>
-          </>
-        ) : (
-          <>
-            {/* 🎉 AFTER BIRTHDAY */}
-            <h1 className="text-4xl font-bold text-purple-600 animate-bounce">
-              Happy Birthday 🎉
-            </h1>
+              <div className="flex justify-center gap-4">
+                <TimeBox label="Hours" value={hours} />
+                <TimeBox label="Minutes" value={minutes} />
+                <TimeBox label="Seconds" value={seconds} />
+              </div>
 
-            <h2 className="text-xl mt-2 text-gray-700">
-              Chavani 💖
-            </h2>
+              <p className="mt-6 text-gray-700">
+                Just a little more time… 💖
+              </p>
+            </>
+          )}
 
-            <div className="w-20 h-1 bg-pink-400 mx-auto my-6 rounded-full"></div>
+          {/* 🎉 HAPPY BIRTHDAY */}
+          {isBirthdayTime && videoDone && (
+            <>
+              <h1 className="text-4xl font-bold text-purple-600">
+                Happy Birthday 🎉
+              </h1>
 
-            <p className="text-gray-700 text-lg leading-relaxed">
-              💖✨ Dear Chavani, mujhe birthday wishes ka sahi tareeka nahi aata,
-              lekin mujhe yaad hai hamare poore din… shayad time zyada nahi hua,
-              par kuch kahaniyaan bahut khaas hoti hain 💖✨
-            </p>
+              <h2 className="text-xl mt-2 text-gray-700">
+                To Someone Truly Special 💖
+              </h2>
 
-            {/* 🔘 Buttons */}
-            <div className="flex justify-center gap-4 mt-8">
-              <button
-                onClick={() => navigate("/rain")}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-pink-400 to-rose-500 text-white font-semibold shadow-lg hover:scale-105 transition"
-              >
-                🌧️ Rain
-              </button>
+              <div className="w-20 h-1 bg-pink-400 mx-auto my-6 rounded-full"></div>
 
-              <button
-                onClick={() => navigate("/bick")}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold shadow-lg hover:scale-105 transition"
-              >
-                🏍️ Bick
-              </button>
-            </div>
+              <p className="text-gray-700 text-lg leading-relaxed">
+                May your day be filled with happiness,
+                smiles, and beautiful moments ✨
+              </p>
 
-            <p className="mt-8 text-sm text-gray-600">
-              Made with ❤️ by your best friend
-            </p>
+              <p className="mt-8 text-sm text-gray-600">
+                Made with ❤️ by your best friend
+              </p>
+            </>
+          )}
 
-            {/* 🎵 Song
-            <audio ref={audioRef} loop>
-                <source src="/birthday-song.mp3" type="audio/mpeg" />
-            </audio> */}
-          </>
-        )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
-/* ⏱️ Small clock box component */
 function TimeBox({ label, value }) {
   return (
     <div className="bg-white rounded-xl shadow-md px-5 py-4 w-24">
